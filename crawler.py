@@ -51,16 +51,16 @@ class Crawler():
   def crawlStargazer(self, storeUserInfo):
     stargazers = self.repo.get_stargazers()
     size = self.repo.stargazers_count
-    self.parseCollection(stargazers, size, True, './stargazer.user', False)
+    self.parseCollection(stargazers, size, storeUserInfo, './stargazer.user', False)
 
   def crawlContributor(self, storeUserInfo):
     contributors = self.repo.get_contributors()
-    self.parseCollection(contributors, -1, True, './contributor.user', False)
+    self.parseCollection(contributors, -1, storeUserInfo, './contributor.user', False)
 
   def crawlForks(self, storeUserInfo):
     forks = self.repo.get_forks()
     size = self.repo.forks_count
-    self.parseCollection(forks, size, True, './forks.user', True)
+    self.parseCollection(forks, size, storeUserInfo, './forks.user', True)
 
 
 if __name__ == '__main__':

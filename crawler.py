@@ -19,11 +19,19 @@ class Crawler():
     self.chooseOneAccount()
 
   def chooseOneAccount(self):
-    idx = random.randint(0, len(self.account)-1)
-    login_id, login_passwd = self.account[idx].split(',')
-    print 'choose one github account:', login_id, login_passwd
-    self.gh = Github(login_id, login_passwd, per_page=self.per_page)
-    self.repo = self.gh.get_user(self.user_name).get_repo(self.repo_name)
+    retry_times = 0
+    while retry_times < 10:
+      try:
+        idx = random.randint(0, len(self.account)-1)
+        login_id, login_passwd = self.account[idx].split(',')
+        self.gh = Github(login_id, login_passwd, per_page=self.per_page)
+        self.repo = self.gh.get_user(self.user_name).get_repo(self.repo_name)
+        print 'choose one github account:', login_id, login_passwd
+        break
+      except Exception, e:
+        retry_times += 1
+
+
  
   def getCityData(self):
     f = open('./cities.json','r')

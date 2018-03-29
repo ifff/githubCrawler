@@ -29,6 +29,7 @@ class Crawler():
     data = json.load(f)
     city_country = {}
     for item in data:
+      if item['country'] != 'CN': continue
       city_country[item["name"].lower()] = item["country"]
     print 'load city data completed..'
     return city_country

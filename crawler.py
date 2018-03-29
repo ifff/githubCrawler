@@ -73,12 +73,12 @@ class Crawler():
 
   def crawlContributor(self, storeUserInfo):
     contributors = self.repo.get_contributors()
-    self.parseCollection(contributors, -1, storeUserInfo, './contributor.user', False, './contributor.user')
+    self.parseCollection(contributors, -1, storeUserInfo, './contributor.user', False, './contributor.restart')
 
   def crawlForks(self, storeUserInfo):
     forks = self.repo.get_forks()
     size = self.repo.forks_count
-    self.parseCollection(forks, size, storeUserInfo, './forks.user', True, './forks.user')
+    self.parseCollection(forks, size, storeUserInfo, './forks.user', True, './forks.restart')
 
 
 if __name__ == '__main__':

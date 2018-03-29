@@ -1,5 +1,7 @@
+# -*- coding: utf8 -*-
 from github import Github
 import json
+import os
 
 class Crawler():
   def __init__(self, login_id, login_passwd, user, repo):
@@ -17,17 +19,30 @@ class Crawler():
     return city_country
 
 
-  def parseCollection(self, collection, collection_size, storeUserInfo, log_file, isForks):
+  def parseCollection(self, collection, collection_size, storeUserInfo, log_file, isForks, restart_file):
     china_count = 0
     total_valid_count = 0
     total_count = collection_size
     count = 0
-    fw = open(log_file, 'a')
-    for user in collection:
+    # restart from log file
+    restart = 0
+    if os.path.exists(restart_file):
+      fr_restart = open(restart_file,'r')
+      line = fr_restart.readline()
+      if line:
+        restart, china_count, total_valid_count = [int(i) for i in line.strip().split(',')]
+    count = restart
+
+    for user in collection[restart:]:
       if isForks:
         user = user.owner
       count += 1
       print 'processed: %d/%d, china user in valid users: %d/%d' % (count, total_count, china_count, total_valid_count)
+      # store the progress
+      if count % 10 == 0:
+        fw_restart = open(restart_file, 'w')
+        fw_restart.write('%d,%d,%d' %(count, china_count, total_valid_count))
+        fw_restart.close()
       location = user.location
       if location is None:continue
       location = location.lower()
@@ -43,7 +58,10 @@ class Crawler():
           check = True
       if check and storeUserInfo:
         user_info = '%s##%s##%s##%s##%s\n' % (user.login, user.name, user.email, user.followers, location)
-        fw.write(user_info)
+        print user_info
+        fw = open(log_file, 'a')
+        fw.write(user_info.encode('utf8'))
+        fw.close()
 
     print '%d,%d,%d' % (china_count, total_valid_count, total_count)
 
@@ -51,20 +69,20 @@ class Crawler():
   def crawlStargazer(self, storeUserInfo):
     stargazers = self.repo.get_stargazers()
     size = self.repo.stargazers_count
-    self.parseCollection(stargazers, size, storeUserInfo, './stargazer.user', False)
+    self.parseCollection(stargazers, size, storeUserInfo, './stargazer.user', False, './stargazer.restart')
 
   def crawlContributor(self, storeUserInfo):
     contributors = self.repo.get_contributors()
-    self.parseCollection(contributors, -1, storeUserInfo, './contributor.user', False)
+    self.parseCollection(contributors, -1, storeUserInfo, './contributor.user', False, './contributor.user')
 
   def crawlForks(self, storeUserInfo):
     forks = self.repo.get_forks()
     size = self.repo.forks_count
-    self.parseCollection(forks, size, storeUserInfo, './forks.user', True)
+    self.parseCollection(forks, size, storeUserInfo, './forks.user', True, './forks.user')
 
 
 if __name__ == '__main__':
   crawler = Crawler('testaccount135', 'testaccount123', 'tensorflow', 'tensorflow')
-  crawler.crawlStargazer(False)
+  crawler.crawlStargazer(True)
   #crawler.crawlContributor(False)
   #crawler.crawlForks(True)

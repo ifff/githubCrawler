@@ -54,7 +54,7 @@ class Crawler():
       for user in collection.get_page(cur_page):
         if flag == 'fork':
           user = user.owner
-        elif flag == 'stargazer':
+        elif flag == 'stargazer' or flag == 'issue':
           # print 'starred_time: ', user.starred_at, user.user.name
           user = user.user
         count += 1
@@ -118,10 +118,34 @@ class Crawler():
         self.chooseOneAccount()
         print 'retry %d and changed the account...' % (retry_times)
 
+  def crawlWatcher(self, storeUserInfo):
+    retry_times = 0
+    while retry_times < self.max_retry_times:
+      watchers = self.repo.get_subscribers()
+      size = self.repo.subscribers_count
+      try:
+        self.parseCollection(watchers, size, storeUserInfo, './watcher.user', 'watcher', './watcher.restart')
+      except Exception, e:
+        self.chooseOneAccount()
+        print 'retry %d and changed the account...' % (retry_times)
+
+  def crawlIssue(self, storeUserInfo):
+    retry_times = 0
+    while retry_times < self.max_retry_times:
+      issues = self.repo.get_issues()
+      size = self.repo.open_issues_count
+      try:
+        self.parseCollection(issues, size, storeUserInfo, './issue.user', 'issue', './issue.restart')
+      except Exception, e:
+        self.chooseOneAccount()
+        print 'retry %d and changed the account...' % (retry_times)
+
 
 
 if __name__ == '__main__':
   crawler = Crawler('tensorflow', 'tensorflow')
-  crawler.crawlStargazer(True)
-  #crawler.crawlContributor(False)
+  #crawler.crawlStargazer(True)
+  #crawler.crawlContributor(True)
   #crawler.crawlForks(True)
+  #crawler.crawlWatcher(True)
+  crawler.crawlIssue(True)

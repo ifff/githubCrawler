@@ -3,6 +3,7 @@ from github import Github
 import json
 import os
 import random
+import sys
 
 class Crawler():
   def __init__(self, user, repo, per_page=30, max_retry_times=5):
@@ -87,6 +88,7 @@ class Crawler():
       cur_page += 1
 
   def crawlStargazer(self, storeUserInfo):
+    print 'start crawl stargazers...'
     retry_times = 0
     while retry_times < self.max_retry_times:
       stargazers = self.repo.get_stargazers_with_dates()
@@ -98,6 +100,7 @@ class Crawler():
         print 'retry %d and changed the account...' % (retry_times)
 
   def crawlContributor(self, storeUserInfo):
+    print 'start crawl contributor...'
     retry_times = 0
     while retry_times < self.max_retry_times:
       try:
@@ -108,6 +111,7 @@ class Crawler():
         print 'retry %d and changed the account...' % (retry_times)
 
   def crawlForks(self, storeUserInfo):
+    print 'start crawl forks...'
     retry_times = 0
     while retry_times < self.max_retry_times:
       try:
@@ -119,6 +123,7 @@ class Crawler():
         print 'retry %d and changed the account...' % (retry_times)
 
   def crawlWatcher(self, storeUserInfo):
+    print 'start crawl watcher...'
     retry_times = 0
     while retry_times < self.max_retry_times:
       watchers = self.repo.get_subscribers()
@@ -130,6 +135,7 @@ class Crawler():
         print 'retry %d and changed the account...' % (retry_times)
 
   def crawlIssue(self, storeUserInfo):
+    print 'start crawl issue...'
     retry_times = 0
     while retry_times < self.max_retry_times:
       issues = self.repo.get_issues()
@@ -143,9 +149,21 @@ class Crawler():
 
 
 if __name__ == '__main__':
-  crawler = Crawler('tensorflow', 'tensorflow')
-  #crawler.crawlStargazer(True)
-  #crawler.crawlContributor(True)
-  #crawler.crawlForks(True)
-  #crawler.crawlWatcher(True)
-  crawler.crawlIssue(True)
+  if len(sys.argv) < 3:
+    print 'argv[1]: repo_name (tensorflow or models)'
+    print 'argv[2]: option(1:stargazer, 2:contributor, 3:fork, 4:watcher, 5:issue)'
+    exit()
+  crawler = Crawler('tensorflow', sys.argv[1])
+  option = int(sys.argv[2])
+  if option == 1:
+    crawler.crawlStargazer(True)
+  elif option == 2:
+    crawler.crawlContributor(True)
+  elif option == 3:
+    crawler.crawlForks(True)
+  elif option == 4:
+    crawler.crawlWatcher(True)
+  elif option == 5:
+    crawler.crawlIssue(True)
+  else:
+    print 'invalid option'

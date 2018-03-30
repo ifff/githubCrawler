@@ -9,4 +9,4 @@ Notice that there is the rate limit from Github API, in order to increase the sp
 ## requirements
 	$ pip install PyGithub
 ## How to use it
-	$ python crawler.py
+	$ python crawler.py tensorflow/models option(1/2/3/4/5)

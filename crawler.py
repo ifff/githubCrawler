@@ -29,7 +29,10 @@ class Crawler():
         print 'choose one github account:', login_id, login_passwd
         break
       except Exception, e:
-        retry_times += 1
+        retry_times += 1  
+        print e
+        print 'retry %d to choose one account:' % retry_times
+
 
 
  
@@ -74,6 +77,14 @@ class Crawler():
           fw_restart.write('%d,%d,%d' %(int(count/self.per_page), china_count, total_valid_count))
           fw_restart.close()
         location = user.location
+        # store user info
+        if storeUserInfo:
+          user_info = '%s##%s##%s##%s##%s\n' % (user.login, user.name, user.email, user.followers, location)
+          print user_info
+          fw = open(log_file, 'a')
+          fw.write(user_info.encode('utf8'))
+          fw.close()
+
         if location is None:continue
         location = location.lower()
         total_valid_count += 1
@@ -86,12 +97,6 @@ class Crawler():
           if self.city_country.has_key(token[0]) and self.city_country[token[0]]=='CN':
             china_count += 1
             check = True
-        if check and storeUserInfo:
-          user_info = '%s##%s##%s##%s##%s\n' % (user.login, user.name, user.email, user.followers, location)
-          print user_info
-          fw = open(log_file, 'a')
-          fw.write(user_info.encode('utf8'))
-          fw.close()
       # iterate next page
       cur_page += 1
 
